@@ -20,7 +20,7 @@ function! s:DeleteAllBuffers()
 
   call <SID>DeleteBuffer(bufnr('.'))
 
-  return s:deleted_buffer_count . ' buffers deleted!'
+  echom s:deleted_buffer_count . ' buffers deleted!'
 endfunction
 
-command! Bdall echom <SID>DeleteAllBuffers()
+command! Bdall call <SID>DeleteAllBuffers()
