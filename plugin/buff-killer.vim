@@ -14,6 +14,18 @@
 
     return l:indexes
   endfunction
+
+  function! s:OtherIndexes(indexes)
+    let l:indexes = []
+
+    for buf_index in range(1, bufnr('$'))
+      if index(a:indexes, buf_index) < 0
+        call add(l:indexes, buf_index)
+      endif
+    endfor
+
+    return l:indexes
+  endfunction
 "}}}
 
 function! s:DeletableBufferIndexes(retain_buffers)
@@ -48,6 +60,14 @@ function! s:DeleteBuffersRetainPattern(pattern)
   call <SID>DeleteOtherBuffers(l:matching_indexes)
 endfunction
 
+function! s:DeleteBuffersPattern(pattern)
+  let l:matching_indexes = <SID>MatchingBufferIndexes(a:pattern)
+  let l:non_matching_indexes = <SID>OtherIndexes(l:matching_indexes)
+
+  call <SID>DeleteOtherBuffers(l:non_matching_indexes)
+endfunction
+
 command! BdAll call <SID>DeleteBuffers()
 command! BdOthers call <SID>DeleteOtherBuffers([bufnr('%')])
 command! -nargs=1 BdRetainPattern call <SID>DeleteBuffersRetainPattern(<f-args>)
+command! -nargs=1 BdPattern call <SID>DeleteBuffersPattern(<f-args>)
