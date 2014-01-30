@@ -24,4 +24,4 @@ function! s:DeleteBuffers()
   call <SID>DeleteOtherBuffers()
 endfunction
 
-command! Bdall call <SID>DeleteBuffers()
+command! BdAll call <SID>DeleteBuffers()
