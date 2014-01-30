@@ -2,7 +2,7 @@ function! s:DeletableBufferIndexes()
   let l:indexes = []
 
   for buf_index in range(1, bufnr('$'))
-    if bufloaded(buf_index) && strlen(bufname(buf_index))
+    if bufloaded(buf_index)
       call add(l:indexes, buf_index)
     endif
   endfor
