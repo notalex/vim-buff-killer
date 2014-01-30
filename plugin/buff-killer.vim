@@ -1,26 +1,27 @@
-function! s:DeleteBuffer(number)
-  execute 'bdelete ' . a:number
+function! s:DeletableBufferIndexes()
+  let l:indexes = []
 
-  let s:deleted_buffer_count += 1
-endfunction
-
-function! s:DeleteAllBuffers()
-  let l:index = 1
-  let s:deleted_buffer_count = 0
-
-  while l:index <= bufnr('$')
-    " Deleting *unnamed buffer* incorrectly affects deleted_buffer_count.
-    " Avoiding current buffer here prevents *unnamed buffer* from being deleted.
-    if bufloaded(l:index) && bufnr('.') != l:index
-      call <SID>DeleteBuffer(l:index)
+  for buf_index in range(1, bufnr('$'))
+    if bufloaded(buf_index) && strlen(bufname(buf_index))
+      call add(l:indexes, buf_index)
     endif
+  endfor
 
-    let l:index += 1
-  endwhile
-
-  call <SID>DeleteBuffer(bufnr('.'))
-
-  echom s:deleted_buffer_count . ' buffers deleted!'
+  return l:indexes
 endfunction
 
-command! Bdall call <SID>DeleteAllBuffers()
+function! s:DeleteOtherBuffers()
+  let l:deleteable_buffer_indexes = <SID>DeletableBufferIndexes()
+
+  for buf_index in l:deleteable_buffer_indexes
+    execute 'bdelete ' . buf_index
+  endfor
+
+  echom len(l:deleteable_buffer_indexes) . ' buffers deleted!'
+endfunction
+
+function! s:DeleteBuffers()
+  call <SID>DeleteOtherBuffers()
+endfunction
+
+command! Bdall call <SID>DeleteBuffers()
