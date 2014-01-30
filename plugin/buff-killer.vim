@@ -1,3 +1,21 @@
+"private {{{
+  function! s:MatchingBufferIndexes(pattern)
+    let l:very_magic_pattern = '\v' . a:pattern
+    let l:indexes = []
+
+    for buf_index in range(1, bufnr('$'))
+      let l:buffer_name = bufname(buf_index)
+      let l:buffer_file_name = matchstr(l:buffer_name, '\v[^/]+$')
+
+      if strlen(matchstr(l:buffer_file_name, l:very_magic_pattern))
+        call add(l:indexes, buf_index)
+      endif
+    endfor
+
+    return l:indexes
+  endfunction
+"}}}
+
 function! s:DeletableBufferIndexes(retain_buffers)
   let l:indexes = []
 
@@ -24,5 +42,12 @@ function! s:DeleteBuffers()
   call <SID>DeleteOtherBuffers([0])
 endfunction
 
+function! s:DeleteBuffersRetainPattern(pattern)
+  let l:matching_indexes = <SID>MatchingBufferIndexes(a:pattern)
+
+  call <SID>DeleteOtherBuffers(l:matching_indexes)
+endfunction
+
 command! BdAll call <SID>DeleteBuffers()
 command! BdOthers call <SID>DeleteOtherBuffers([bufnr('%')])
+command! -nargs=1 BdRetainPattern call <SID>DeleteBuffersRetainPattern(<f-args>)
